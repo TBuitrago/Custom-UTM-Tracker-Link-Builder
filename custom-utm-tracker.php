@@ -3,7 +3,7 @@
  * Plugin Name: Custom UTM Tracker & Link Builder
  * Plugin URI: https://github.com/TBuitrago/Custom-UTM-Tracker-Link-Builder
  * Description: Captures specific URL parameters (utm_source, utm_campaign, etc.) and stores them in cookies for up to 30 days. Includes admin interface for managing custom cookies and generating shareable links.
- * Version: 1.0.0
+ * Version: 1.0.1
  * GitHub Plugin URI: https://github.com/TBuitrago/Custom-UTM-Tracker-Link-Builder
  * GitHub Branch: main
  * Author: Tomas Buitrago
@@ -24,7 +24,7 @@ require_once plugin_dir_path(__FILE__) . 'includes/class-github-updater.php';
 // Define plugin constants
 define('CUTM_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('CUTM_PLUGIN_PATH', plugin_dir_path(__FILE__));
-define('CUTM_VERSION', '1.0.0');
+define('CUTM_VERSION', '1.0.1');
 
 /**
  * Main plugin class
