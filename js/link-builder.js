@@ -38,17 +38,17 @@
             // Create URL object using home_url + relative path
             const url = new URL(cutm_ajax.home_url + baseUrl);
 
-            // Add parameters
+            // Add parameters from custom cookies
             let hasParams = false;
-            for (let i = 1; i <= 5; i++) {
-                const key = $(`[name="param_key_${i}"]`).val().trim();
-                const value = $(`[name="param_value_${i}"]`).val().trim();
-
-                if (key && value) {
+            $('.param-value').each(function() {
+                const value = $(this).val().trim();
+                const key = $(this).closest('.cutm-param-inputs').find('.param-key').val().trim();
+                
+                if (value) {
                     url.searchParams.append(key, value);
                     hasParams = true;
                 }
-            }
+            });
 
             // Update result
             if (hasParams) {

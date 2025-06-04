@@ -32,16 +32,12 @@ define('CUTM_VERSION', '1.0.1');
 class CustomUTMTracker {
     
     /**
-     * Tracking parameters to monitor
+     * Get tracking parameters from custom cookies
      */
-    private $tracking_params = array(
-        'utm_source',
-        'utm_campaign',
-        'utm_medium',
-        'utm_term',
-        'utm_adgroup',
-        'utm_content'
-    );
+    private function get_tracking_params() {
+        $custom_cookies = get_option('cutm_custom_cookies', array());
+        return array_keys($custom_cookies);
+    }
 
     /**
      * Constructor
@@ -61,9 +57,12 @@ class CustomUTMTracker {
             return;
         }
 
-        // Check if any UTM parameters are present in the URL
+        // Get tracking parameters from custom cookies
+        $tracking_params = $this->get_tracking_params();
+
+        // Check if any parameters are present in the URL
         $has_utm = false;
-        foreach ($this->tracking_params as $param) {
+        foreach ($tracking_params as $param) {
             if (!empty($_GET[$param])) {
                 $has_utm = true;
                 break;
@@ -71,8 +70,8 @@ class CustomUTMTracker {
         }
 
         if ($has_utm) {
-            // Store UTM parameters in cookies
-            foreach ($this->tracking_params as $param) {
+            // Store parameters in cookies
+            foreach ($tracking_params as $param) {
                 if (!empty($_GET[$param])) {
                     $clean_value = sanitize_text_field($_GET[$param]);
                     setcookie($param, $clean_value, time() + (30 * DAY_IN_SECONDS), '/');
@@ -82,7 +81,7 @@ class CustomUTMTracker {
         } else {
             // Check if we have UTM parameters in cookies but not in URL
             $params_from_cookie = array();
-            foreach ($this->tracking_params as $param) {
+            foreach ($tracking_params as $param) {
                 if (!empty($_COOKIE[$param])) {
                     $params_from_cookie[$param] = sanitize_text_field($_COOKIE[$param]);
                 }
@@ -90,7 +89,7 @@ class CustomUTMTracker {
 
             // If we have stored parameters, redirect to include them
             if (!empty($params_from_cookie)) {
-                $clean_url = remove_query_arg($this->tracking_params);
+                $clean_url = remove_query_arg($tracking_params);
                 $redirect_url = add_query_arg($params_from_cookie, $clean_url);
 
                 $current_url = home_url(add_query_arg(null, null));
