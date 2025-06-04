@@ -41,21 +41,34 @@ if (!defined('ABSPATH')) {
 
             <div class="cutm-params-container">
                 <h3><?php echo esc_html__('UTM Parameters', 'custom-utm-tracker'); ?></h3>
-                <?php for ($i = 1; $i <= 5; $i++) : ?>
-                    <div class="cutm-param-group">
-                        <label><?php echo sprintf(esc_html__('Parameter %d:', 'custom-utm-tracker'), $i); ?></label>
-                        <div class="cutm-param-inputs">
-                            <input type="text" 
-                                   name="param_key_<?php echo $i; ?>" 
-                                   class="param-key" 
-                                   placeholder="<?php echo esc_attr__('Key (e.g., utm_source)', 'custom-utm-tracker'); ?>">
-                            <input type="text" 
-                                   name="param_value_<?php echo $i; ?>" 
-                                   class="param-value" 
-                                   placeholder="<?php echo esc_attr__('Value (e.g., google)', 'custom-utm-tracker'); ?>">
+                <?php
+                // Get custom cookies from options
+                $custom_cookies = get_option('cutm_custom_cookies', array());
+                
+                if (empty($custom_cookies)) {
+                    echo '<p class="description">' . esc_html__('No custom parameters defined yet. Please add them in the Custom Cookies section.', 'custom-utm-tracker') . '</p>';
+                } else {
+                    foreach ($custom_cookies as $key => $cookie) : ?>
+                        <div class="cutm-param-group">
+                            <label><?php echo esc_html($key); ?>:</label>
+                            <div class="cutm-param-inputs">
+                                <input type="text" 
+                                       class="param-key" 
+                                       value="<?php echo esc_attr($key); ?>" 
+                                       readonly 
+                                       style="background: #f0f0f1;">
+                                <input type="text" 
+                                       name="param_value_<?php echo esc_attr($key); ?>" 
+                                       class="param-value" 
+                                       placeholder="<?php echo esc_attr__('Enter value', 'custom-utm-tracker'); ?>">
+                            </div>
+                            <?php if (!empty($cookie['description'])) : ?>
+                                <p class="description"><?php echo esc_html($cookie['description']); ?></p>
+                            <?php endif; ?>
                         </div>
-                    </div>
-                <?php endfor; ?>
+                    <?php endforeach;
+                }
+                ?>
             </div>
 
             <div class="cutm-actions">
