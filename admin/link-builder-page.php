@@ -36,7 +36,7 @@ if (!defined('ABSPATH')) {
                     ?>
                 </select>
                 <p class="description"><?php echo esc_html__('Or enter a custom URL below:', 'custom-utm-tracker'); ?></p>
-                <input type="text" id="base_url" name="base_url" class="regular-text" placeholder="/your-page">
+                <input type="text" id="base_url" name="base_url" class="regular-text" placeholder="<?php echo esc_attr(home_url()); ?>">
             </div>
 
             <div class="cutm-params-container">

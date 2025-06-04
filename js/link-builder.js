@@ -24,25 +24,28 @@
         $generateBtn.on('click', function() {
             let baseUrl = $baseUrl.val().trim();
             
-            // Validate base URL
+            // If no URL is entered, use the site URL
             if (!baseUrl) {
-                alert('Please enter a base URL');
-                return;
+                baseUrl = cutm_ajax.home_url;
+            } else if (baseUrl.startsWith('http://') || baseUrl.startsWith('https://')) {
+                // If full URL is entered, use it as is
+                baseUrl = baseUrl;
+            } else {
+                // If relative URL is entered, append to home URL
+                if (!baseUrl.startsWith('/')) {
+                    baseUrl = '/' + baseUrl;
+                }
+                baseUrl = cutm_ajax.home_url + baseUrl;
             }
 
-            // Ensure base URL starts with /
-            if (!baseUrl.startsWith('/')) {
-                baseUrl = '/' + baseUrl;
-            }
+            // Create URL object
+            const url = new URL(baseUrl);
 
-            // Create URL object using home_url + relative path
-            const url = new URL(cutm_ajax.home_url + baseUrl);
-
-            // Add parameters from custom cookies
+            // Add parameters
             let hasParams = false;
-            $('.param-value').each(function() {
-                const value = $(this).val().trim();
-                const key = $(this).closest('.cutm-param-inputs').find('.param-key').val().trim();
+            $('.cutm-param-inputs').each(function() {
+                const key = $(this).find('.param-key').val().trim();
+                const value = $(this).find('.param-value').val().trim();
                 
                 if (value) {
                     url.searchParams.append(key, value);

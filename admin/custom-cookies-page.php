@@ -64,7 +64,6 @@ $custom_cookies = get_option('cutm_custom_cookies', array());
                         <tr>
                             <th scope="col"><?php echo esc_html__('Cookie Key', 'custom-utm-tracker'); ?></th>
                             <th scope="col"><?php echo esc_html__('Description', 'custom-utm-tracker'); ?></th>
-                            <th scope="col"><?php echo esc_html__('Current Value', 'custom-utm-tracker'); ?></th>
                             <th scope="col"><?php echo esc_html__('Actions', 'custom-utm-tracker'); ?></th>
                         </tr>
                     </thead>
@@ -73,18 +72,6 @@ $custom_cookies = get_option('cutm_custom_cookies', array());
                             <tr>
                                 <td><?php echo esc_html($key); ?></td>
                                 <td><?php echo esc_html($cookie['description']); ?></td>
-                                <td>
-                                    <input type="text" 
-                                           class="cookie-value-input" 
-                                           data-cookie-key="<?php echo esc_attr($key); ?>" 
-                                           value="<?php echo esc_attr(isset($_COOKIE[$key]) ? $_COOKIE[$key] : ''); ?>"
-                                           placeholder="<?php echo esc_attr__('Set value...', 'custom-utm-tracker'); ?>">
-                                    <button type="button" 
-                                            class="button save-cookie-value" 
-                                            data-cookie-key="<?php echo esc_attr($key); ?>">
-                                        <?php echo esc_html__('Save', 'custom-utm-tracker'); ?>
-                                    </button>
-                                </td>
                                 <td>
                                     <button type="button" 
                                             class="button delete-cookie" 
