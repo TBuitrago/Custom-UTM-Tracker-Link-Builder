@@ -22,43 +22,56 @@
 
         // Generate URL
         $generateBtn.on('click', function() {
-            let baseUrl = $baseUrl.val().trim();
-            
-            // If no URL is entered, use the site URL
-            if (!baseUrl) {
-                baseUrl = cutm_ajax.home_url;
-            } else if (baseUrl.startsWith('http://') || baseUrl.startsWith('https://')) {
-                // If full URL is entered, use it as is
-                baseUrl = baseUrl;
-            } else {
-                // If relative URL is entered, append to home URL
-                if (!baseUrl.startsWith('/')) {
-                    baseUrl = '/' + baseUrl;
-                }
-                baseUrl = cutm_ajax.home_url + baseUrl;
-            }
-
-            // Create URL object
-            const url = new URL(baseUrl);
-
-            // Add parameters
-            let hasParams = false;
-            $('.cutm-param-inputs').each(function() {
-                const key = $(this).find('.param-key').val().trim();
-                const value = $(this).find('.param-value').val().trim();
+            try {
+                // Get base URL from select or input
+                let baseUrl = '';
+                const selectedUrl = $pageSelect.val();
                 
-                if (value) {
-                    url.searchParams.append(key, value);
-                    hasParams = true;
+                if (selectedUrl) {
+                    // Use selected page URL
+                    baseUrl = selectedUrl;
+                } else {
+                    // Get URL from input
+                    baseUrl = $baseUrl.val().trim();
+                    
+                    // If no URL is entered, use home URL
+                    if (!baseUrl) {
+                        baseUrl = cutm_ajax.home_url;
+                    } else if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
+                        // If relative URL is entered, append to home URL
+                        if (!baseUrl.startsWith('/')) {
+                            baseUrl = '/' + baseUrl;
+                        }
+                        baseUrl = cutm_ajax.home_url + baseUrl;
+                    }
                 }
-            });
 
-            // Update result
-            if (hasParams) {
-                $finalUrl.val(url.toString());
-                $copyBtn.prop('disabled', false);
-            } else {
-                alert('Please add at least one parameter');
+                // Create URL object
+                const url = new URL(baseUrl);
+
+                // Add parameters
+                let hasParams = false;
+                $('.param-value').each(function() {
+                    const value = $(this).val();
+                    if (value && value.trim()) {
+                        const key = $(this).closest('.cutm-param-inputs').find('.param-key').val();
+                        if (key) {
+                            url.searchParams.append(key.trim(), value.trim());
+                            hasParams = true;
+                        }
+                    }
+                });
+
+                // Update result
+                if (hasParams) {
+                    $finalUrl.val(url.toString());
+                    $copyBtn.prop('disabled', false);
+                } else {
+                    alert('Please add at least one parameter');
+                }
+            } catch (error) {
+                console.error('Error generating URL:', error);
+                alert('An error occurred while generating the URL. Please check the console for details.');
             }
         });
 

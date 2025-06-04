@@ -15,6 +15,7 @@ if (!defined('ABSPATH')) {
                 <label for="base_url"><?php echo esc_html__('Select or Enter URL:', 'custom-utm-tracker'); ?></label>
                 <select id="page_select" class="cutm-select">
                     <option value=""><?php echo esc_html__('-- Select a page --', 'custom-utm-tracker'); ?></option>
+                    <option value="<?php echo esc_attr(home_url()); ?>" data-relative="/"><?php echo esc_html__('Site URL', 'custom-utm-tracker'); ?></option>
                     <?php
                     // Get published pages
                     $pages = get_pages(array(
