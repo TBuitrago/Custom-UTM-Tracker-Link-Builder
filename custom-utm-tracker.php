@@ -1,9 +1,11 @@
 <?php
 /**
  * Plugin Name: Custom UTM Tracker & Link Builder
- * Plugin URI: https://surchdigital.com/custom-utm-tracker
+ * Plugin URI: https://github.com/TBuitrago/Custom-UTM-Tracker-Link-Builder
  * Description: Captures specific URL parameters (utm_source, utm_campaign, etc.) and stores them in cookies for up to 30 days. Includes admin interface for managing custom cookies and generating shareable links.
- * Version: 1.0
+ * Version: 1.0.0
+ * GitHub Plugin URI: https://github.com/TBuitrago/Custom-UTM-Tracker-Link-Builder
+ * GitHub Branch: main
  * Author: Tomas Buitrago
  * Author URI: https://surchdigital.com
  * Company: Surch Digital
@@ -15,6 +17,9 @@
 if (!defined('ABSPATH')) {
     exit;
 }
+
+// Include GitHub updater class
+require_once plugin_dir_path(__FILE__) . 'includes/class-github-updater.php';
 
 // Define plugin constants
 define('CUTM_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -316,6 +321,15 @@ function cutm_init() {
 
     // Set custom cookies on frontend
     add_action('init', array($plugin, 'set_custom_cookies'));
+
+    // Initialize GitHub updater
+    if (is_admin()) {
+        new CUTM_GitHub_Updater(
+            __FILE__,
+            'TBuitrago',
+            'Custom-UTM-Tracker-Link-Builder'
+        );
+    }
 }
 add_action('plugins_loaded', 'cutm_init');
 
