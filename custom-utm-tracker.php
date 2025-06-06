@@ -46,6 +46,22 @@ class CustomUTMTracker {
         add_action('init', array($this, 'store_utm_in_cookies'));
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
+        add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_scripts'));
+    }
+
+    /**
+     * Enqueue frontend scripts
+     */
+    public function enqueue_frontend_scripts() {
+        $tracking_params = $this->get_tracking_params();
+        wp_enqueue_script(
+            'cutm-auto-attach-utm',
+            CUTM_PLUGIN_URL . 'js/auto-attach-utm.js',
+            array(),
+            CUTM_VERSION,
+            true
+        );
+        wp_localize_script('cutm-auto-attach-utm', 'cutm_utm_params', $tracking_params);
     }
 
     /**
