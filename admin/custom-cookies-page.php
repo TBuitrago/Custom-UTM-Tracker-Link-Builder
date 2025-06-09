@@ -64,6 +64,7 @@ $custom_cookies = get_option('cutm_custom_cookies', array());
                         <tr>
                             <th scope="col"><?php echo esc_html__('Cookie Key', 'custom-utm-tracker'); ?></th>
                             <th scope="col"><?php echo esc_html__('Description', 'custom-utm-tracker'); ?></th>
+                            <th scope="col"><?php echo esc_html__('WPForms Value', 'custom-utm-tracker'); ?></th>
                             <th scope="col"><?php echo esc_html__('Actions', 'custom-utm-tracker'); ?></th>
                         </tr>
                     </thead>
@@ -72,6 +73,16 @@ $custom_cookies = get_option('cutm_custom_cookies', array());
                             <tr>
                                 <td><?php echo esc_html($key); ?></td>
                                 <td><?php echo esc_html($cookie['description']); ?></td>
+                                <td>
+                                    <div class="wpforms-value-container">
+                                        <code class="wpforms-value">{query_var key="<?php echo esc_attr($key); ?>"}</code>
+                                        <button type="button" 
+                                                class="button copy-value" 
+                                                data-value="{query_var key=&quot;<?php echo esc_attr($key); ?>&quot;}">
+                                            <?php echo esc_html__('Copy', 'custom-utm-tracker'); ?>
+                                        </button>
+                                    </div>
+                                </td>
                                 <td>
                                     <button type="button" 
                                             class="button delete-cookie" 
@@ -110,6 +121,23 @@ $custom_cookies = get_option('cutm_custom_cookies', array());
         }
         .wp-list-table td {
             vertical-align: middle;
+        }
+        .wpforms-value-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .wpforms-value {
+            background: #f0f0f1;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 13px;
+            user-select: all;
+        }
+        .copy-value {
+            padding: 2px 8px !important;
+            height: auto !important;
+            min-height: 26px;
         }
     </style>
 </div>

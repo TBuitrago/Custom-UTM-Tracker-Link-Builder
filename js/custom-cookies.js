@@ -74,6 +74,30 @@ jQuery(document).ready(function($) {
         });
     });
 
+    // Handle copying WPForms value
+    $('.copy-value').on('click', function() {
+        const $btn = $(this);
+        const value = $btn.data('value');
+        
+        // Create temporary textarea to copy from
+        const $temp = $('<textarea>');
+        $('body').append($temp);
+        $temp.val(value).select();
+
+        try {
+            document.execCommand('copy');
+            // Show success message
+            const $msg = $('<span class="success-msg" style="color: green; margin-left: 10px;">✓ Copied</span>');
+            $btn.after($msg);
+            setTimeout(() => $msg.fadeOut('slow', function() { $(this).remove(); }), 2000);
+        } catch (err) {
+            console.error('Failed to copy:', err);
+            alert('Failed to copy value. Please try again.');
+        }
+
+        $temp.remove();
+    });
+
     // Handle deleting cookie
     $('.delete-cookie').on('click', function() {
         if (!confirm('Are you sure you want to delete this cookie?')) {
