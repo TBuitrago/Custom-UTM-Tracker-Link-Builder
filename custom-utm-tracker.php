@@ -53,15 +53,14 @@ class CustomUTMTracker {
      * Enqueue frontend scripts
      */
     public function enqueue_frontend_scripts() {
-        $tracking_params = $this->get_tracking_params();
+        // Enqueue datetime script for WPForms
         wp_enqueue_script(
-            'cutm-auto-attach-utm',
-            CUTM_PLUGIN_URL . 'js/auto-attach-utm.js',
-            array(),
+            'cutm-form-datetime',
+            CUTM_PLUGIN_URL . 'js/form-datetime.js',
+            array('jquery', 'wpforms'),
             CUTM_VERSION,
             true
         );
-        wp_localize_script('cutm-auto-attach-utm', 'cutm_utm_params', $tracking_params);
     }
 
     /**
