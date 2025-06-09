@@ -9,31 +9,53 @@
         if (parts.length === 2) return decodeURIComponent(parts.pop().split(";").shift());
     }
 
-    // Function to add hidden fields to a form
-    function addHiddenFields(form) {
+    // Function to add hidden fields specifically for WPForms
+    function addWPFormsFields(form) {
+        // Get the form ID from the form element
+        var formIdMatch = form.id.match(/wpforms-form-(\d+)/);
+        if (!formIdMatch) return;
+        
+        var formId = formIdMatch[1];
+        var lastFieldId = 0;
+
+        // Find the last field ID in the form
+        form.querySelectorAll('[data-field-id]').forEach(function(field) {
+            var fieldId = parseInt(field.getAttribute('data-field-id'));
+            if (!isNaN(fieldId)) {
+                lastFieldId = Math.max(lastFieldId, fieldId);
+            }
+        });
+
         utmParams.forEach(function(param) {
             var value = getCookie(param);
             if (value) {
-                // Check if hidden input already exists
-                var existingInput = form.querySelector('input[name="' + param + '"]');
-                if (!existingInput) {
+                lastFieldId++;
+                
+                // Check if field already exists
+                var fieldId = 'wpforms-' + formId + '-field_' + lastFieldId;
+                if (!document.getElementById(fieldId)) {
+                    var wrapper = document.createElement('div');
+                    wrapper.id = 'wpforms-' + formId + '-field_' + lastFieldId + '-container';
+                    wrapper.className = 'wpforms-field wpforms-field-hidden';
+                    wrapper.setAttribute('data-field-id', lastFieldId);
+
                     var input = document.createElement('input');
                     input.type = 'hidden';
-                    input.name = param;
+                    input.id = fieldId;
+                    input.name = 'wpforms[fields][' + lastFieldId + ']';
                     input.value = value;
+
+                    wrapper.appendChild(input);
                     
-                    // Special handling for WPForms
-                    if (form.classList.contains('wpforms-form')) {
-                        // Create a wrapper div as WPForms expects
-                        var wrapper = document.createElement('div');
-                        wrapper.classList.add('wpforms-field', 'wpforms-field-hidden');
-                        wrapper.style.display = 'none';
-                        wrapper.appendChild(input);
-                        form.appendChild(wrapper);
+                    // Insert before the submit button
+                    var submit = form.querySelector('.wpforms-submit-container');
+                    if (submit) {
+                        form.insertBefore(wrapper, submit);
                     } else {
-                        // For other forms, add input directly
-                        form.appendChild(input);
+                        form.appendChild(wrapper);
                     }
+
+                    console.log('UTM Tracker: Added field', param, 'with value', value, 'to form', formId);
                 }
             }
         });
@@ -50,19 +72,17 @@
             return;
         }
 
-        // Handle existing forms
-        var forms = document.querySelectorAll('form');
-        forms.forEach(addHiddenFields);
+        // Handle existing WPForms
+        document.querySelectorAll('.wpforms-form').forEach(addWPFormsFields);
 
         // Watch for dynamically added forms using MutationObserver
         var observer = new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
                 mutation.addedNodes.forEach(function(node) {
-                    if (node.nodeName === 'FORM') {
-                        addHiddenFields(node);
+                    if (node.classList && node.classList.contains('wpforms-form')) {
+                        addWPFormsFields(node);
                     } else if (node.querySelectorAll) {
-                        var forms = node.querySelectorAll('form');
-                        forms.forEach(addHiddenFields);
+                        node.querySelectorAll('.wpforms-form').forEach(addWPFormsFields);
                     }
                 });
             });
@@ -72,5 +92,7 @@
             childList: true,
             subtree: true
         });
+
+        console.log('UTM Tracker: Initialized with parameters:', utmParams);
     });
 })();
