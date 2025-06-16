@@ -248,6 +248,63 @@ class CustomUTMTracker {
     }
 
     /**
+     * AJAX handler to save a generated link to history
+     */
+    public function ajax_save_link_history() {
+        check_ajax_referer('cutm_nonce', 'nonce');
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+
+        $url = isset($_POST['url']) ? esc_url_raw($_POST['url']) : '';
+
+        if (empty($url)) {
+            wp_send_json_error(array('message' => 'URL is required'));
+        }
+
+        $link_history = get_option('cutm_link_history', array());
+
+        $timestamp = time();
+
+        // Save link with timestamp as key
+        $link_history[$timestamp] = $url;
+
+        update_option('cutm_link_history', $link_history);
+
+        wp_send_json_success();
+    }
+
+    /**
+     * AJAX handler to delete a link from history
+     */
+    public function ajax_delete_link_history() {
+        check_ajax_referer('cutm_nonce', 'nonce');
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+        }
+
+        $timestamp = isset($_POST['timestamp']) ? intval($_POST['timestamp']) : 0;
+
+        if (!$timestamp) {
+            wp_send_json_error(array('message' => 'Invalid timestamp'));
+        }
+
+        $link_history = get_option('cutm_link_history', array());
+
+        if (!isset($link_history[$timestamp])) {
+            wp_send_json_error(array('message' => 'Link not found'));
+        }
+
+        unset($link_history[$timestamp]);
+
+        update_option('cutm_link_history', $link_history);
+
+        wp_send_json_success();
+    }
+
+    /**
      * AJAX handler to update cookie value (set cookie)
      */
     public function ajax_update_cookie_value() {
@@ -332,6 +389,8 @@ function cutm_init() {
     add_action('wp_ajax_cutm_add_cookie', array($plugin, 'ajax_add_cookie'));
     add_action('wp_ajax_cutm_update_cookie_value', array($plugin, 'ajax_update_cookie_value'));
     add_action('wp_ajax_cutm_delete_cookie', array($plugin, 'ajax_delete_cookie'));
+    add_action('wp_ajax_cutm_save_link_history', array($plugin, 'ajax_save_link_history'));
+    add_action('wp_ajax_cutm_delete_link_history', array($plugin, 'ajax_delete_link_history'));
 
     // Set custom cookies on frontend
     add_action('init', array($plugin, 'set_custom_cookies'));

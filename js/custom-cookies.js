@@ -75,17 +75,23 @@ jQuery(document).ready(function($) {
     });
 
     // Handle copying WPForms value
-    $('.copy-value').on('click', function() {
+    $(document).on('click', '.copy-value', async function() {
         const $btn = $(this);
         const value = $btn.data('value');
         
-        // Create temporary textarea to copy from
-        const $temp = $('<textarea>');
-        $('body').append($temp);
-        $temp.val(value).select();
-
         try {
-            document.execCommand('copy');
+            // Try using modern clipboard API first
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(value);
+            } else {
+                // Fallback to older method
+                const $temp = $('<textarea>');
+                $('body').append($temp);
+                $temp.val(value).select();
+                document.execCommand('copy');
+                $temp.remove();
+            }
+            
             // Show success message
             const $msg = $('<span class="success-msg" style="color: green; margin-left: 10px;">✓ Copied</span>');
             $btn.after($msg);
@@ -94,8 +100,6 @@ jQuery(document).ready(function($) {
             console.error('Failed to copy:', err);
             alert('Failed to copy value. Please try again.');
         }
-
-        $temp.remove();
     });
 
     // Handle deleting cookie

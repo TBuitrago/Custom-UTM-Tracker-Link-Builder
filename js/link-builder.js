@@ -113,6 +113,83 @@
             $temp.remove();
         }
 
+        // Save URL to history
+        $('#save_url').on('click', function() {
+            const url = $finalUrl.val();
+            if (!url) {
+                alert('No URL to save');
+                return;
+            }
+
+            $.ajax({
+                url: cutm_ajax.ajax_url,
+                method: 'POST',
+                data: {
+                    action: 'cutm_save_link_history',
+                    nonce: cutm_ajax.nonce,
+                    url: url
+                },
+                success: function(response) {
+                    if (response.success) {
+                        alert('URL saved to history');
+                        location.reload();
+                    } else {
+                        alert(response.data.message || 'Failed to save URL');
+                    }
+                },
+                error: function() {
+                    alert('Failed to save URL. Please try again.');
+                }
+            });
+        });
+
+        // Copy link from history
+        $(document).on('click', '.copy-history-url', function() {
+            const url = $(this).data('url');
+            if (!url) return;
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('Copied to clipboard');
+                }).catch(() => {
+                    fallbackCopyToClipboard(url);
+                });
+            } else {
+                fallbackCopyToClipboard(url);
+            }
+        });
+
+        // Delete link from history
+        $(document).on('click', '.delete-history-url', function() {
+            if (!confirm('Are you sure you want to delete this link?')) {
+                return;
+            }
+
+            const timestamp = $(this).data('timestamp');
+            if (!timestamp) return;
+
+            $.ajax({
+                url: cutm_ajax.ajax_url,
+                method: 'POST',
+                data: {
+                    action: 'cutm_delete_link_history',
+                    nonce: cutm_ajax.nonce,
+                    timestamp: timestamp
+                },
+                success: function(response) {
+                    if (response.success) {
+                        alert('Link deleted');
+                        location.reload();
+                    } else {
+                        alert(response.data.message || 'Failed to delete link');
+                    }
+                },
+                error: function() {
+                    alert('Failed to delete link. Please try again.');
+                }
+            });
+        });
+
         // Show success message
         function showCopySuccess() {
             const $btn = $copyBtn;

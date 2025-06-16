@@ -19,11 +19,11 @@
     $(document).ready(function() {
         // Handle form submissions
         $('.wpforms-form').on('wpformsBeforeSubmit', function() {
-            // Find datetime hidden field by its name (assuming it's named 'submission_datetime')
-            const $dateField = $(this).find('input[name="wpforms[fields][submission_datetime]"]');
-            if ($dateField.length) {
-                $dateField.val(getCurrentDateTime());
-            }
+        // Find datetime hidden field by its ID
+        const $dateField = $(this).find('input[id^="wpforms-"][id$="-field_16"]');
+        if ($dateField.length) {
+            $dateField.val(getCurrentDateTime());
+        }
         });
     });
 })(jQuery);

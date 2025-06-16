@@ -82,12 +82,61 @@ if (!defined('ABSPATH')) {
                 <h3><?php echo esc_html__('Generated URL:', 'custom-utm-tracker'); ?></h3>
                 <div class="cutm-url-display">
                     <textarea id="final_url" rows="3" class="large-text code" readonly></textarea>
-                    <button type="button" id="copy_url" class="button">
-                        <?php echo esc_html__('Copy to Clipboard', 'custom-utm-tracker'); ?>
-                    </button>
+                    <div class="cutm-url-actions">
+                        <button type="button" id="copy_url" class="button">
+                            <?php echo esc_html__('Copy to Clipboard', 'custom-utm-tracker'); ?>
+                        </button>
+                        <button type="button" id="save_url" class="button button-primary">
+                            <?php echo esc_html__('Save to History', 'custom-utm-tracker'); ?>
+                        </button>
+                    </div>
                 </div>
             </div>
         </form>
+
+        <!-- Link History Section -->
+        <div class="cutm-history">
+            <h3><?php echo esc_html__('Link History', 'custom-utm-tracker'); ?></h3>
+            <?php
+            $link_history = get_option('cutm_link_history', array());
+            if (!empty($link_history)) : ?>
+                <table class="wp-list-table widefat fixed striped">
+                    <thead>
+                        <tr>
+                            <th scope="col"><?php echo esc_html__('URL', 'custom-utm-tracker'); ?></th>
+                            <th scope="col"><?php echo esc_html__('Created', 'custom-utm-tracker'); ?></th>
+                            <th scope="col"><?php echo esc_html__('Actions', 'custom-utm-tracker'); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($link_history as $timestamp => $url) : ?>
+                            <tr>
+                                <td class="column-url">
+                                    <div class="url-text"><?php echo esc_html($url); ?></div>
+                                </td>
+                                <td class="column-date">
+                                    <?php echo esc_html(date('Y-m-d H:i:s', $timestamp)); ?>
+                                </td>
+                                <td class="column-actions">
+                                    <button type="button" 
+                                            class="button copy-history-url" 
+                                            data-url="<?php echo esc_attr($url); ?>">
+                                        <?php echo esc_html__('Copy', 'custom-utm-tracker'); ?>
+                                    </button>
+                                    <button type="button" 
+                                            class="button delete-history-url" 
+                                            data-timestamp="<?php echo esc_attr($timestamp); ?>">
+                                        <?php echo esc_html__('Delete', 'custom-utm-tracker'); ?>
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php else : ?>
+                <p><?php echo esc_html__('No links in history.', 'custom-utm-tracker'); ?></p>
+            <?php endif; ?>
+        </div>
     </div>
 
     <style>
@@ -115,11 +164,32 @@ if (!defined('ABSPATH')) {
         .cutm-url-display {
             margin-top: 10px;
         }
+        .cutm-url-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
         .cutm-actions {
             margin: 20px 0;
         }
-        #copy_url {
-            margin-top: 10px;
+        .cutm-history {
+            margin-top: 40px;
+        }
+        .column-url {
+            width: 60%;
+        }
+        .column-date {
+            width: 20%;
+        }
+        .column-actions {
+            width: 20%;
+            text-align: right;
+        }
+        .url-text {
+            word-break: break-all;
+        }
+        .column-actions .button {
+            margin-left: 5px;
         }
     </style>
 </div>
