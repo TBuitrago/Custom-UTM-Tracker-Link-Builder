@@ -1,31 +1,25 @@
 # Custom UTM Tracker & Link Builder
 
-A WordPress plugin that captures specific URL parameters (e.g., utm_source, utm_campaign, etc.) and stores them in cookies for up to 30 days. It also includes an admin interface for generating shareable links by appending up to 5 custom parameters to any internal URL.
+A WordPress plugin that captures specific URL parameters (e.g., utm_source, utm_campaign, etc.) and stores them in cookies for up to 30 days. It also includes an admin interface for generating shareable links by appending custom parameters to any internal URL.
 
 ## Features
 
-- **Parameter Tracking**: Automatically captures and stores up to 6 UTM parameters in cookies
+- **Parameter Tracking**: Automatically captures and stores UTM parameters in cookies
 - **Cookie Persistence**: Parameters are stored for 30 days and persist across sessions
 - **Automatic Appending**: Stored parameters are automatically appended to internal navigation when missing
 - **Clean URL Redirects**: Users are redirected to clean URLs that include saved parameters
 - **Admin Link Builder**: Easy-to-use interface for generating custom parameterized URLs
+- **Link History**: Save generated URLs to history, copy, and delete them from the admin interface
+- **Custom Cookies Management**: Admin interface to add, update, copy, and delete custom cookies
+- **DateTime Field Population**: Automatically populates a hidden datetime field in WPForms on submission
 - **WordPress Integration**: Seamlessly integrates with WordPress admin under Tools menu
-
-## Tracked Parameters
-
-The plugin tracks these URL parameters by default:
-- `utm_source`
-- `utm_campaign`
-- `utm_medium`
-- `utm_term`
-- `utm_adgroup`
-- `utm_content`
 
 ## Installation
 
 1. Upload the `custom-utm-tracker` folder to your `/wp-content/plugins/` directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. Navigate to **Tools > UTM Link Builder** to start creating custom links
+4. Navigate to **Tools > Custom Cookies** to manage custom cookies
 
 ## Usage
 
@@ -42,11 +36,20 @@ The plugin automatically works in the background:
 
 1. Go to **WordPress Admin > Tools > UTM Link Builder**
 2. Select a page from the dropdown or enter a custom URL path
-3. Add up to 5 custom parameters with their values
+3. Add custom parameters with their values
 4. Click "Generate URL" to create the final link
 5. Copy the generated URL to your clipboard
+6. Save generated URLs to history for later use
+7. Copy or delete URLs from the history list
 
-### Example Usage
+### Custom Cookies Admin Interface
+
+1. Go to **WordPress Admin > Tools > Custom Cookies**
+2. Add new custom cookies with keys and descriptions
+3. Update cookie values and copy them to clipboard
+4. Delete custom cookies as needed
+
+## Example Usage
 
 **Original URL**: `https://yoursite.com/services`
 
@@ -58,9 +61,12 @@ The plugin automatically works in the background:
 custom-utm-tracker/
 ├── custom-utm-tracker.php      # Main plugin file
 ├── js/
-│   └── link-builder.js         # JavaScript for admin interface
+│   ├── link-builder.js         # JavaScript for admin interface
+│   ├── custom-cookies.js       # JavaScript for custom cookies admin page
+│   └── form-datetime.js        # JavaScript for WPForms datetime field population
 ├── admin/
-│   └── link-builder-page.php   # Admin page template
+│   ├── link-builder-page.php   # Admin page template for link builder
+│   └── custom-cookies-page.php # Admin page template for custom cookies
 └── README.md                   # This file
 ```
 
@@ -103,3 +109,10 @@ GPL v2 or later
 - Admin link builder interface
 - Automatic parameter appending
 - Clean URL redirects
+
+### Version 1.0.1
+- Added link history feature to save, copy, and delete generated URLs
+- Added custom cookies admin interface with add, update, copy, and delete functionality
+- Fixed copy button functionality using modern clipboard API with fallback
+- Fixed WPForms hidden datetime field population on form submission
+- Improved event handling with delegated event listeners for dynamic elements
