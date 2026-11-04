@@ -87,7 +87,7 @@ The [Release workflow](.github/workflows/release.yml) then lints the code, build
 
 ### Updating sites still on 1.0.1 (one time only)
 
-Version 1.0.1 shipped an updater that only works inside wp-admin and cannot see `v`-prefixed tags, so it never detected the `v2.0.x` releases. It does detect `2.1.0`, but cannot install it in the background. On each site, once:
+Version 1.0.1 shipped an updater that only works inside wp-admin and cannot see `v`-prefixed tags, so it never detected any release. It does detect `2.1.0`, but cannot install it in the background. On each site, once:
 
 1. Go to **Dashboard > Updates** and click **Check again**
 2. Update **Custom UTM Tracker & Link Builder** to 2.1.0
