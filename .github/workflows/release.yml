@@ -1,0 +1,100 @@
+name: Release
+
+# Publishes a GitHub release whenever the plugin version changes on main.
+# Every site running the plugin finds the release through the WordPress update
+# system (see includes/class-cutm-updater.php) and installs it automatically.
+#
+# To ship an update: bump "Version:" and CUTM_VERSION in custom-utm-tracker.php,
+# then merge/push to main. Pushes that don't change the version publish nothing.
+#
+# Tags are plain versions ("2.1.0", no "v" prefix): the updater shipped in
+# 1.0.1 compares the raw tag name and cannot see "v"-prefixed tags.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read and validate the plugin version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          file=custom-utm-tracker.php
+          header=$(sed -nE 's|^[[:space:]*#@/]*Version:[[:space:]]*([^[:space:]]+).*|\1|p' "$file" | head -n1)
+          constant=$(sed -nE "s|.*define\(['\"]CUTM_VERSION['\"],[[:space:]]*['\"]([^'\"]+)['\"]\).*|\1|p" "$file" | head -n1)
+          echo "Version header: ${header:-<none>} / CUTM_VERSION: ${constant:-<none>}"
+          if [[ -z "$header" || "$header" != "$constant" ]]; then
+            echo "::error file=$file::The 'Version:' header (${header:-none}) and CUTM_VERSION (${constant:-none}) must match."
+            exit 1
+          fi
+          if [[ ! "$header" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error file=$file::Version '$header' must look like 1.2.3."
+            exit 1
+          fi
+          echo "version=$header" >> "$GITHUB_OUTPUT"
+
+      - name: Lint PHP files
+        run: find . -name '*.php' -not -path './.git/*' -print0 | xargs -0 -n1 php -l
+
+      - name: Decide whether to publish
+        id: check
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          tags=$(gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" --paginate --jq '.[].tag_name' | sed 's/^[vV]//')
+
+          if printf '%s\n' "$tags" | grep -qxF "$VERSION"; then
+            echo "Release $VERSION already exists, nothing to publish."
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if git ls-remote --exit-code --tags origin "refs/tags/$VERSION" >/dev/null 2>&1; then
+            echo "::error::Tag $VERSION already exists without a release. Delete the tag or bump the version."
+            exit 1
+          fi
+
+          latest=$(printf '%s\n' "$tags" | grep -E '^[0-9]+(\.[0-9]+)*$' | sort -V | tail -n1 || true)
+          if [[ -n "$latest" && "$(printf '%s\n%s\n' "$latest" "$VERSION" | sort -V | tail -n1)" != "$VERSION" ]]; then
+            echo "::error::Version $VERSION is lower than the latest release ($latest). Bump the version."
+            exit 1
+          fi
+
+          echo "publish=true" >> "$GITHUB_OUTPUT"
+
+      - name: Build plugin ZIP
+        if: steps.check.outputs.publish == 'true'
+        run: |
+          mkdir -p dist
+          git archive --format=zip --prefix=custom-utm-tracker/ --output=dist/custom-utm-tracker.zip HEAD
+          unzip -l dist/custom-utm-tracker.zip
+
+      - name: Publish release
+        if: steps.check.outputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          gh release create "$VERSION" dist/custom-utm-tracker.zip \
+            --target "$GITHUB_SHA" \
+            --title "Custom UTM Tracker & Link Builder $VERSION" \
+            --generate-notes \
+            --latest

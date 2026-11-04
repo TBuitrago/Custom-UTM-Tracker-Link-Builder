@@ -2,7 +2,6 @@
     'use strict';
 
     $(document).ready(function() {
-        const $form = $('#utm-builder-form');
         const $pageSelect = $('#page_select');
         const $baseUrl = $('#base_url');
         const $generateBtn = $('#generate_url');
@@ -23,27 +22,19 @@
         // Generate URL
         $generateBtn.on('click', function() {
             try {
-                // Get base URL from select or input
-                let baseUrl = '';
-                const selectedUrl = $pageSelect.val();
-                
-                if (selectedUrl) {
-                    // Use selected page URL
-                    baseUrl = selectedUrl;
-                } else {
-                    // Get URL from input
-                    baseUrl = $baseUrl.val().trim();
-                    
+                // The input always holds the URL to use: selecting a page fills it
+                // with that page's path, and it can then be edited freely.
+                let baseUrl = $baseUrl.val().trim();
+
+                if (!baseUrl) {
                     // If no URL is entered, use home URL
-                    if (!baseUrl) {
-                        baseUrl = cutm_ajax.home_url;
-                    } else if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
-                        // If relative URL is entered, append to home URL
-                        if (!baseUrl.startsWith('/')) {
-                            baseUrl = '/' + baseUrl;
-                        }
-                        baseUrl = cutm_ajax.home_url + baseUrl;
+                    baseUrl = cutm_ajax.home_url;
+                } else if (!/^https?:\/\//i.test(baseUrl)) {
+                    // If relative URL is entered, append to home URL
+                    if (!baseUrl.startsWith('/')) {
+                        baseUrl = '/' + baseUrl;
                     }
+                    baseUrl = cutm_ajax.home_url.replace(/\/+$/, '') + baseUrl;
                 }
 
                 // Create URL object

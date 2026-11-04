@@ -1,0 +1,4 @@
+# Keep repository tooling out of the plugin ZIPs (GitHub archives and release assets).
+/.github        export-ignore
+/.gitattributes export-ignore
+/.gitignore     export-ignore

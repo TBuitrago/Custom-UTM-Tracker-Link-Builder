@@ -6,6 +6,9 @@ if (!defined('ABSPATH')) {
 
 // Get saved custom cookies
 $custom_cookies = get_option('cutm_custom_cookies', array());
+if (!is_array($custom_cookies)) {
+    $custom_cookies = array();
+}
 ?>
 
 <div class="wrap">
@@ -30,7 +33,7 @@ $custom_cookies = get_option('cutm_custom_cookies', array());
                                    required 
                                    placeholder="<?php echo esc_attr__('e.g., custom_source', 'custom-utm-tracker'); ?>">
                             <p class="description">
-                                <?php echo esc_html__('Enter a unique identifier for your cookie. Use only letters, numbers, and underscores.', 'custom-utm-tracker'); ?>
+                                <?php echo esc_html__('The URL parameter to capture (e.g. utm_source). Use only lowercase letters, numbers, and underscores.', 'custom-utm-tracker'); ?>
                             </p>
                         </td>
                     </tr>
@@ -58,6 +61,9 @@ $custom_cookies = get_option('cutm_custom_cookies', array());
         <!-- Existing Cookies List -->
         <div class="cutm-cookies-list">
             <h2><?php echo esc_html__('Existing Cookies', 'custom-utm-tracker'); ?></h2>
+            <p class="description">
+                <?php echo esc_html__('To send a value with WPForms, add a Hidden field and paste the "WPForms Value" as its Default Value. The value stored in the visitor\'s cookie is used when the form is submitted, even if the visitor arrived on another page.', 'custom-utm-tracker'); ?>
+            </p>
             <?php if (!empty($custom_cookies)) : ?>
                 <table class="wp-list-table widefat fixed striped">
                     <thead>
@@ -72,7 +78,7 @@ $custom_cookies = get_option('cutm_custom_cookies', array());
                         <?php foreach ($custom_cookies as $key => $cookie) : ?>
                             <tr>
                                 <td><?php echo esc_html($key); ?></td>
-                                <td><?php echo esc_html($cookie['description']); ?></td>
+                                <td><?php echo esc_html(isset($cookie['description']) ? $cookie['description'] : ''); ?></td>
                                 <td>
                                     <div class="wpforms-value-container">
                                         <code class="wpforms-value">{query_var key="<?php echo esc_attr($key); ?>"}</code>
