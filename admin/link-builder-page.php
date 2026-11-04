@@ -45,8 +45,8 @@ if (!defined('ABSPATH')) {
                 <?php
                 // Get custom cookies from options
                 $custom_cookies = get_option('cutm_custom_cookies', array());
-                
-                if (empty($custom_cookies)) {
+
+                if (empty($custom_cookies) || !is_array($custom_cookies)) {
                     echo '<p class="description">' . esc_html__('No custom parameters defined yet. Please add them in the Custom Cookies section.', 'custom-utm-tracker') . '</p>';
                 } else {
                     foreach ($custom_cookies as $key => $cookie) : ?>
@@ -99,7 +99,10 @@ if (!defined('ABSPATH')) {
             <h3><?php echo esc_html__('Link History', 'custom-utm-tracker'); ?></h3>
             <?php
             $link_history = get_option('cutm_link_history', array());
-            if (!empty($link_history)) : ?>
+            if (is_array($link_history)) {
+                krsort($link_history, SORT_NUMERIC); // Newest first.
+            }
+            if (!empty($link_history) && is_array($link_history)) : ?>
                 <table class="wp-list-table widefat fixed striped">
                     <thead>
                         <tr>
@@ -115,7 +118,7 @@ if (!defined('ABSPATH')) {
                                     <div class="url-text"><?php echo esc_html($url); ?></div>
                                 </td>
                                 <td class="column-date">
-                                    <?php echo esc_html(date('Y-m-d H:i:s', $timestamp)); ?>
+                                    <?php echo esc_html(wp_date('Y-m-d H:i:s', (int) $timestamp)); ?>
                                 </td>
                                 <td class="column-actions">
                                     <button type="button" 
